@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    <div>home</div>
+    <div style="height: 3000px;">home</div>
 </template>
