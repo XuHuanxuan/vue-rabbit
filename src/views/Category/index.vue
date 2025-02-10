@@ -31,7 +31,7 @@ const { categoryList } = useCategory()
                 <h3>全部分类</h3>
                 <ul>
                     <li v-for="item in categoryList.children" :key="item.id">
-                        <RouterLink to="/">
+                        <RouterLink :to="`/category/sub/${item.id}`">
                             <img :src="item.picture" />
                             <p>{{ item.name }}</p>
                         </RouterLink>
