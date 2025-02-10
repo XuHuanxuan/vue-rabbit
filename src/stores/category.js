@@ -9,7 +9,8 @@ export const useCategoryStore = defineStore('category', () => {
     // action 获取导航数据的方法
     const getCategory = async () => {
         const res = await axiosGetCategory()
-        categoryList.value = res.result
+        console.log(res)
+        categoryList.value = res.data.result
     }
 
     return {
