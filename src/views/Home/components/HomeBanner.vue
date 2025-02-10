@@ -1,5 +1,5 @@
 <script setup>
-import { axiosGetBanner } from '@/stores/home'
+import { axiosGetBanner } from '@/apis/home'
 import { ref, onMounted } from 'vue'
 
 const bannerList = ref([])
