@@ -1,7 +1,8 @@
 <script setup>
 import { axiosGetGoodDetail } from '@/apis/detail'
-import { onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import DetailHot from './components/DetailHot.vue'
 
 const goods = ref({})
 const route = useRoute()
@@ -22,8 +23,10 @@ onMounted(() => {
             <div class="bread-container">
                 <el-breadcrumb separator=">">
                     <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                    <el-breadcrumb-item :to="{ path: `/category/${goods.categories?.[1].id}` }">{{ goods.categories?.[1].name }}</el-breadcrumb-item>
-                    <el-breadcrumb-item :to="{ path: `/category/sub/${goods.categories?.[0].id}` }">{{ goods.categories?.[0].name }}</el-breadcrumb-item>
+                    <el-breadcrumb-item :to="{ path: `/category/${goods.categories?.[1].id}` }">{{
+                        goods.categories?.[1].name }}</el-breadcrumb-item>
+                    <el-breadcrumb-item :to="{ path: `/category/sub/${goods.categories?.[0].id}` }">{{
+                        goods.categories?.[0].name }}</el-breadcrumb-item>
                     <el-breadcrumb-item>抓绒保暖，毛毛虫子儿童运动鞋</el-breadcrumb-item>
                 </el-breadcrumb>
             </div>
@@ -116,7 +119,10 @@ onMounted(() => {
                         </div>
                         <!-- 24热榜+专题推荐 -->
                         <div class="goods-aside">
-
+                            <!-- 24Hour -->
+                            <DetailHot :hot-type="1"></DetailHot>
+                            <!-- Week -->
+                            <DetailHot :hot-type="2"></DetailHot>
                         </div>
                     </div>
                 </div>
