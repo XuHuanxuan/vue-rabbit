@@ -1,18 +1,36 @@
 <script setup>
-import { axiosGetCategoryFilter } from '@/apis/category'
+import { axiosGetCategoryFilter, axiosGetSubCategory } from '@/apis/category'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import GoodsItem from '@/components/GoodsItem.vue'
 
 const route = useRoute()
 const categoryFilterList = ref({})
 const getCategoryFilter = async () => {
     const res = await axiosGetCategoryFilter(route.params.id)
-    console.log(res)
+    // console.log(res)
     categoryFilterList.value = res.data.result
 }
 
 onMounted(() => {
     getCategoryFilter()
+})
+
+const goodsList = ref([])
+const requestData = ref({
+    categoryId: route.params.id,
+    page: 1,
+    pageSize: 20,
+    sortField: 'publishTime'
+})
+const getSubCategory = async () => {
+    const res = await axiosGetSubCategory(requestData.value)
+    console.log(res)
+    goodsList.value = res.data.result.items
+}
+
+onMounted(() => {
+    getSubCategory()
 })
 </script>
 
@@ -22,7 +40,8 @@ onMounted(() => {
         <div class="bread-container">
             <el-breadcrumb separator=">">
                 <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{path: `/category/${categoryFilterList.parentId}` }">{{ categoryFilterList.parentName }}</el-breadcrumb-item>
+                <el-breadcrumb-item :to="{path: `/category/${categoryFilterList.parentId}` }">{{
+                    categoryFilterList.parentName }}</el-breadcrumb-item>
                 <el-breadcrumb-item>{{ categoryFilterList.name }}</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -34,13 +53,12 @@ onMounted(() => {
             </el-tabs>
             <div class="body">
                 <!-- 商品列表-->
+                <GoodsItem v-for="item in goodsList" :goods="item" :key="item.id" />
             </div>
         </div>
     </div>
 
 </template>
-
-
 
 <style lang="scss" scoped>
 .bread-container {
