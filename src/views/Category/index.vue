@@ -3,6 +3,7 @@ import { axiosGetCategory } from '@/apis/category'
 import { axiosGetBanner } from '@/apis/home'
 import { onMounted, onUpdated, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import GoodsItem from '../../components/GoodsItem.vue'
 
 const categoryList = ref({})
 const route = useRoute()
@@ -48,6 +49,26 @@ onUpdated(() => {
                         <img :src="item.imgUrl" alt="">
                     </el-carousel-item>
                 </el-carousel>
+            </div>
+            <!-- 分类列表 -->
+            <div class="sub-list">
+                <h3>全部分类</h3>
+                <ul>
+                    <li v-for="item in categoryList.children" :key="item.id">
+                        <RouterLink to="/">
+                            <img :src="item.picture" />
+                            <p>{{ item.name }}</p>
+                        </RouterLink>
+                    </li>
+                </ul>
+            </div>
+            <div class="ref-goods" v-for="item in categoryList.children" :key="item.id">
+                <div class="head">
+                    <h3>- {{ item.name }}-</h3>
+                </div>
+                <div class="body">
+                    <GoodsItem v-for="goods in item.goods" :goods="goods" :key="goods.id" />
+                </div>
             </div>
         </div>
     </div>
