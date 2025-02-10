@@ -20,3 +20,14 @@ export function axiosGetNew() {
         url: '/home/new'
     })
 }
+
+/**
+ * @description: 获取人气推荐
+ * @param {*}
+ * @return {*}
+ */
+export const axiosGetHot = () => {
+    return httpInstance({
+        url: 'home/hot'
+    })
+}
