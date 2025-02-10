@@ -3,13 +3,14 @@ import { axiosGetCategory } from '@/apis/category'
 import { axiosGetBanner } from '@/apis/home'
 import { onMounted, onUpdated, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { onBeforeRouteUpdate } from 'vue-router'
 import GoodsItem from '../../components/GoodsItem.vue'
 
 const categoryList = ref({})
 const route = useRoute()
-const getCategory = async() => {
-    const res = await axiosGetCategory(route.params.id)
-    console.log(res)
+const getCategory = async (id = route.params.id) => {
+    const res = await axiosGetCategory(id)
+    // console.log(res)
     categoryList.value = res.data.result
 }
 
@@ -27,8 +28,8 @@ onMounted(() => {
     getBanner()
 })
 
-onUpdated(() => {
-    getCategory()
+onBeforeRouteUpdate((to) => {
+    getCategory(to.params.id)
 })
 </script>
 
