@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { axiosLogin } from '@/apis/user'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import 'element-plus/theme-chalk/el-message.css'
+
+const userStore = useUserStore()
 // 表单数据对象
 const userInfo = ref({
     account: 'xiaotuxian001',
@@ -37,12 +39,11 @@ const loginButton = () => {
     // 调用实例方法
     formRef.value.validate(async (valid) => {
         // valid: 所有表单都通过校验  才为true
-        console.log(valid)
+        // console.log(valid)
         // 以valid做为判断条件 如果通过校验才执行登录逻辑
         if (valid) {
             // TODO LOGIN
-            const res = await axiosLogin({ account, password })
-            console.log(res);
+            await userStore.getUserInfo({ account, password })
             //1. 提示用户
             ElMessage({ type: 'success', message: '登录成功' })
             // 2. 跳转首页
