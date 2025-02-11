@@ -1,8 +1,12 @@
 <script setup>
 import { ref } from 'vue'
+import { axiosLogin } from '@/apis/user'
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+import 'element-plus/theme-chalk/el-message.css'
 // 表单数据对象
 const userInfo = ref({
-    account: '1311111111',
+    account: 'xiaotuxian001',
     password: '123456',
     agree: true
 })
@@ -27,6 +31,7 @@ const rules = {
 
 // 获取表单实例
 const formRef = ref(null)
+const router = useRouter()
 const loginButton = () => {
     const { account, password } = userInfo.value
     // 调用实例方法
@@ -36,8 +41,9 @@ const loginButton = () => {
         // 以valid做为判断条件 如果通过校验才执行登录逻辑
         if (valid) {
             // TODO LOGIN
-            await loginAPI({ account, password })
-            // 1. 提示用户
+            const res = await axiosLogin({ account, password })
+            console.log(res);
+            //1. 提示用户
             ElMessage({ type: 'success', message: '登录成功' })
             // 2. 跳转首页
             router.replace({ path: '/' })
