@@ -1,6 +1,7 @@
 import axios from "axios"
 import { ElMessage } from 'element-plus'
 import { useUserStore } from "@/stores/user"
+import { useRouter } from "vue-router"
 import 'element-plus/theme-chalk/el-message.css'
 
 const httpInstance = axios.create({
@@ -32,10 +33,16 @@ httpInstance.interceptors.response.use(function (response) {
 }, function (error) {
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
+    const userStore = useUserStore()
+    const router = useRouter()
     ElMessage({
         type: 'warning',
         message: error.response.data.message
     })
+    if (error.response.status === 401) {
+        userStore.clearUserInfo()
+        router.push('/login')
+    }
     return Promise.reject(error);
 });
 
