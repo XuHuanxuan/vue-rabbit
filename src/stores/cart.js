@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useCartStore = defineStore('cart', () => {
     // 1. 定义state - cartList
@@ -21,9 +21,21 @@ export const useCartStore = defineStore('cart', () => {
             cartList.value.push(goods)
         }
     }
+
+    const delCart = (skuId) => {
+        const index = cartList.value.findIndex((item) => skuId === item.skuId)
+        cartList.value.splice(index, 1)
+    }
+
+    const allGoodCount = computed(() => cartList.value.reduce((a, c) => a + c.count, 0))
+
+    const allGoodPrice = computed(() => cartList.value.reduce((a, c) => a + c.count * c.price, 0))
     return {
         cartList,
-        addCart
+        addCart,
+        delCart,
+        allGoodCount,
+        allGoodPrice
     }
 }, {
     persist: true,
