@@ -13,7 +13,7 @@ const goods = ref({})
 const route = useRoute()
 const getGoodDetail = async () => {
     const res = await axiosGetGoodDetail(route.params.id)
-    // console.log(res)
+    console.log(res)
     goods.value = res.data.result
 }
 

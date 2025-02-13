@@ -7,7 +7,7 @@ const router = useRouter()
 
 const confirm = () => {
     userStore.clearUserInfo()
-    router.push('/login')
+    router.push('/')
 }
 </script>
 
