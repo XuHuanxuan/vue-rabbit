@@ -1,16 +1,71 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { axiosGetCheckInfo } from '@/apis/checkout';
+import { axiosGetCheckInfo } from '@/apis/checkout'
+import { axiosCreateOrder } from '@/apis/checkout'
+import { useRouter } from 'vue-router'
+import { useCartStore } from '@/stores/cart'
 
 const checkInfo = ref({})  // 订单对象
 const defaultAddress = ref({})  // 地址对象
+const activeAddress = ref({})
 const showDialog = ref(false)
+
+const router = useRouter()
+const cartStore = useCartStore()
 
 const getCheckInfo = async() => {
     const res = await axiosGetCheckInfo()
     console.log(res)
     checkInfo.value = res.data.result
     defaultAddress.value = checkInfo.value.userAddresses.find(item => item.isDefault === 0)
+}
+
+const switchAddress = (item) => {
+    activeAddress.value = item
+}
+
+const confirm = () => {
+    defaultAddress.value = activeAddress.value
+    showDialog.value = false
+    activeAddress.value = {}
+}
+
+const changeStyleActive = (e) => {
+    const paymentButtons = document.querySelectorAll('.style .my-btn')
+    paymentButtons.forEach(button => button.classList.remove('active'))
+    e.target.classList.add('active')
+}
+
+const changeTimeActive = (e) => {
+    const paymentButtons = document.querySelectorAll('.time .my-btn')
+    paymentButtons.forEach(button => button.classList.remove('active'))
+    e.target.classList.add('active')
+}
+
+const createOrder = async() => {
+    const res = await axiosCreateOrder({
+        deliveryTimeType: 1,
+        payType: 1,
+        payChannel: 1,
+        buyerMessage: '',
+        goods: checkInfo.value.goods.map(item => {
+            return {
+                skuId: item.skuId,
+                count: item.count
+            }
+        }),
+        addressId: defaultAddress.value.id
+    })
+    console.log(res)
+    const orderId = res.data.result.id
+    router.push({
+        path: '/pay',
+        query: {
+            id: orderId
+        }
+    })
+    // 更新购物车
+    cartStore.updateCartList()
 }
 
 onMounted(() => {
@@ -31,7 +86,8 @@ onMounted(() => {
                             <ul v-else>
                                 <li><span>收<i />货<i />人：</span>{{ defaultAddress.receiver }}</li>
                                 <li><span>联系方式：</span>{{ defaultAddress.contact }}</li>
-                                <li><span>收货地址：</span>{{ defaultAddress.fullLocation }} {{ defaultAddress.address }}</li>
+                                <li><span>收货地址：</span>{{ defaultAddress.fullLocation }} {{ defaultAddress.address }}
+                                </li>
                             </ul>
                         </div>
                         <div class="action">
@@ -74,16 +130,16 @@ onMounted(() => {
                 </div>
                 <!-- 配送时间 -->
                 <h3 class="box-title">配送时间</h3>
-                <div class="box-body">
-                    <a class="my-btn active" href="javascript:;">不限送货时间：周一至周日</a>
-                    <a class="my-btn" href="javascript:;">工作日送货：周一至周五</a>
-                    <a class="my-btn" href="javascript:;">双休日、假日送货：周六至周日</a>
+                <div class="box-body time">
+                    <a class="my-btn active" href="javascript:;" @click="changeTimeActive">不限送货时间：周一至周日</a>
+                    <a class="my-btn" href="javascript:;" @click="changeTimeActive">工作日送货：周一至周五</a>
+                    <a class="my-btn" href="javascript:;" @click="changeTimeActive">双休日、假日送货：周六至周日</a>
                 </div>
                 <!-- 支付方式 -->
                 <h3 class="box-title">支付方式</h3>
-                <div class="box-body">
-                    <a class="my-btn active" href="javascript:;">在线支付</a>
-                    <a class="my-btn" href="javascript:;">货到付款</a>
+                <div class="box-body style">
+                    <a class="my-btn active" href="javascript:;" @click="changeStyleActive">在线支付</a>
+                    <a class="my-btn" href="javascript:;" @click="changeStyleActive">货到付款</a>
                     <span style="color:#999">货到付款需付5元手续费</span>
                 </div>
                 <!-- 金额明细 -->
@@ -110,7 +166,7 @@ onMounted(() => {
                 </div>
                 <!-- 提交订单 -->
                 <div class="submit">
-                    <el-button type="primary" size="large">提交订单</el-button>
+                    <el-button type="primary" size="large" @click="createOrder">提交订单</el-button>
                 </div>
             </div>
         </div>
@@ -118,7 +174,8 @@ onMounted(() => {
     <!-- 切换地址 -->
     <el-dialog v-model="showDialog" title="切换收货地址" width="30%" center>
         <div class="addressWrapper">
-            <div class="text item" v-for="item in checkInfo.userAddresses" :key="item.id">
+            <div class="text item" :class="{ active: activeAddress.id === item.id }"
+                v-for="item in checkInfo.userAddresses" :key="item.id" @click="switchAddress(item)">
                 <ul>
                     <li><span>收<i />货<i />人：</span>{{ item.receiver }} </li>
                     <li><span>联系方式：</span>{{ item.contact }}</li>
@@ -128,8 +185,8 @@ onMounted(() => {
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button>取消</el-button>
-                <el-button type="primary">确定</el-button>
+                <el-button @click="showDialog = false">取消</el-button>
+                <el-button type="primary" @click="confirm">确定</el-button>
             </span>
         </template>
     </el-dialog>

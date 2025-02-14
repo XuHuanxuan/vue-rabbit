@@ -5,3 +5,12 @@ export const axiosGetCheckInfo = () => {
         url: '/member/order/pre'
     })
 }
+
+// 创建订单
+export const axiosCreateOrder = (data) => {
+    return httpInstance({
+        url: '/member/order',
+        method: 'POST',
+        data
+    })
+}
