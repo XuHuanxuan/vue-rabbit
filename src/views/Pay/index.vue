@@ -1,5 +1,34 @@
 <script setup>
-const payInfo = {}
+import { axiosGetOrder } from '@/apis/pay'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useCountDown } from '@/composables/countdown'
+
+const payInfo = ref({})
+
+const route = useRoute()
+const router = useRouter()
+const { start, formatTime } = useCountDown()
+
+const getOrder = async() => {
+    const res = await axiosGetOrder(route.query.id)
+    console.log(res)
+    payInfo.value = res.data.result
+    start(res.data.result.countdown)
+}
+
+onMounted(() => {
+    getOrder()
+})
+
+const baseURL = 'http://pcapi-xiaotuxian-front-devtest.itheima.net/'
+const backURL = 'http://127.0.0.1:5173/paycallback'
+const redirectUrl = encodeURIComponent(backURL)
+const payUrl = `${baseURL}pay/aliPay?orderId=${route.query.id}&redirect=${redirectUrl}`
+
+const pay = () => {
+    router.push('/paycallback')
+}
 </script>
 
 
@@ -11,7 +40,7 @@ const payInfo = {}
                 <span class="icon iconfont icon-queren2"></span>
                 <div class="tip">
                     <p>订单提交成功！请尽快完成支付。</p>
-                    <p>支付还剩 <span>24分30秒</span>, 超时后将取消订单</p>
+                    <p>支付还剩 <span>{{ formatTime }}</span>, 超时后将取消订单</p>
                 </div>
                 <div class="amount">
                     <span>应付总额：</span>
@@ -33,6 +62,9 @@ const payInfo = {}
                     <a class="btn" href="javascript:;">建设银行</a>
                     <a class="btn" href="javascript:;">农业银行</a>
                     <a class="btn" href="javascript:;">交通银行</a>
+                </div>
+                <div class="submit">
+                    <el-button type="primary" size="large" @click="pay">支付</el-button>
                 </div>
             </div>
         </div>
@@ -128,5 +160,12 @@ const payInfo = {}
             background: url(https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/c66f98cff8649bd5ba722c2e8067c6ca.jpg) no-repeat center / contain;
         }
     }
+}
+
+.submit {
+    margin-top: 50px;
+    text-align: right;
+    padding: 60px;
+    border-top: 1px solid #f5f5f5;
 }
 </style>
